@@ -1,0 +1,10 @@
+{
+  "name": "rostercheck-automation",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Scripts run by GitHub Actions for RosterCheck's daily taxi snapshot and violation-email job.",
+  "dependencies": {
+    "pdfkit": "^0.15.0",
+    "nodemailer": "^6.9.14"
+  }
+}
