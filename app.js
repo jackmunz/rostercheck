@@ -266,6 +266,8 @@ function playerTag(p) {
 }
 
 function renderPositionGroup(roster, pos, group) {
+  const taxiSet = new Set(roster.taxi || []);
+  const reserveSet = new Set(roster.reserve || []);
   const playerIds = (roster.players || []).filter(pid => {
     const p = state.playersMap[pid];
     return p && p.position === pos;
@@ -273,6 +275,24 @@ function renderPositionGroup(roster, pos, group) {
 
   const rows = playerIds.map(pid => {
     const p = state.playersMap[pid] || { full_name: pid };
+    const isTaxi = taxiSet.has(pid);
+    const isIR = reserveSet.has(pid);
+
+    if (isTaxi || isIR) {
+      // Doesn't count against the QB/TE limit at all - shown for visibility,
+      // not evaluated, so it should never look like a counted "ok" roster spot.
+      const label = isTaxi ? 'Taxi' : 'IR';
+      return `
+        <div class="player-row">
+          <div class="player-name">
+            <span>${escapeHtml(p.full_name || pid)}</span>
+            <span class="player-tag">${playerTag(p)} \u00b7 doesn't count toward the limit</span>
+          </div>
+          <span class="player-status taxi">${label}</span>
+        </div>
+      `;
+    }
+
     const isExempt = group.exemptPlayerId === pid;
     const detail = group.details[pid];
     const isFlaggedGroup = group.count > group.max;
@@ -656,7 +676,7 @@ function renderAbout() {
           <li>The exception slot's tag shows exactly how and when that acquisition happened - e.g. "Rookie Draft 2026," "Offseason 2026," or "Trade (Week 7 of 2026 season) from Team X who acquired via Rookie Draft 2025" for a player who's since been traded. Trade partner names reflect who currently owns that roster slot, not necessarily who owned it at the time of the trade.</li>
         </ul>
         <h4>Taxi squad rule</h4>
-        <p>Taxi-eligible players must be 1st/2nd-year and drafted or added before Week 1 (same trace logic as above). A player can stay on taxi up to 2 seasons, checked against each season's historical roster snapshot.</p>
+        <p>Taxi-eligible players must be 1st/2nd-year, drafted or added via waiver/free agency at any time (unlike the QB/TE exception, taxi additions aren't restricted to before Week 1 - that would make the 3-moves-per-season allowance meaningless). A player can stay on taxi up to 2 seasons, checked against each season's historical roster snapshot.</p>
         <h4>Taxi moves &amp; promotion tracking</h4>
         <p>If this app is deployed with its GitHub Actions snapshot job running daily, taxi promotions/adds/drops/trades are auto-detected by diffing each day's roster state, and rolled into the move count and "previously promoted" list automatically. Without that job running, these fall back to a manual counter and checklist you maintain yourself.</p>
         <h4>Known limitations</h4>
