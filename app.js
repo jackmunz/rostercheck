@@ -647,6 +647,7 @@ function renderAbout() {
       <div class="about-box">
         <h4>The rule</h4>
         <p>Rosters may carry at most 2 QBs and 2 TEs, unless a 3rd is a rookie or 2nd-year player who was drafted in the rookie draft, or added before Week 1 (including rookie waivers). The exception lasts up to 2 years and carries forward through trades - but not through a drop-and-re-add on waivers.</p>
+        <p>This limit only applies to your active/bench roster - anyone on taxi squad or IR doesn't count against it, since those are separate roster spots governed by their own rules.</p>
         <h4>How eligibility is traced</h4>
         <ul>
           <li>Checks each QB/TE's experience (years_exp \u2264 1).</li>
