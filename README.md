@@ -7,9 +7,10 @@ Sleeper itself doesn't enforce:
   or 2nd-year player drafted in the rookie draft or added before Week 1
   (including rookie waivers). The exception lasts up to 2 years and carries
   forward through trades, but not through a drop-and-re-add on waivers.
-- **Taxi squad rules**: 1st/2nd-year players only, must be drafted or added
-  before Week 1, max 2 seasons on taxi, max 3 taxi moves per season, and a
-  player promoted off taxi can't return to it without going through waivers.
+- **Taxi squad rules**: 1st/2nd-year players only, drafted or added via
+  waiver/free agency at any time during the season, max 2 seasons on taxi,
+  max 3 taxi moves per season, and a player promoted off taxi can't return
+  to it without going through waivers.
 
 It's a static site with no backend for the core checks - it calls Sleeper's
 public API directly from your browser. Two optional background pieces run via
