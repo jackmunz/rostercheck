@@ -68,7 +68,7 @@ function nameForRoster(rosterId, teamNameByRosterId) {
   return (teamNameByRosterId && teamNameByRosterId[rosterId]) || `Roster ${rosterId}`;
 }
 
-function traceEligibility(playerId, currentRosterId, seasonChain, teamNameByRosterId = {}) {
+function traceEligibility(playerId, currentRosterId, seasonChain, teamNameByRosterId = {}, requireBeforeWeek1 = true) {
   const trail = [];
   const chain = []; // structured acquisition steps, discovered most-recent-first, for formatAcquisitionSummary
   let rosterId = currentRosterId;
@@ -120,6 +120,10 @@ function traceEligibility(playerId, currentRosterId, seasonChain, teamNameByRost
       const week1 = seasonEntry.week1Date;
       const acquiredDate = new Date(txn.created);
       chain.push({ type: txn.type, created: txn.created, season: seasonEntry.season, week1Date: seasonEntry.week1Date });
+      if (!requireBeforeWeek1) {
+        trail.push(`Added via ${txn.type} on ${acquiredDate.toISOString().slice(0, 10)}. Qualifies.`);
+        return { eligible: true, reason: 'Acquired via waiver/free agency.', trail, chain };
+      }
       if (week1 && acquiredDate <= week1) {
         trail.push(`Added via ${txn.type} on ${acquiredDate.toISOString().slice(0, 10)}, before Week 1 (${week1.toISOString().slice(0, 10)}) of ${seasonEntry.season}. Qualifies.`);
         return { eligible: true, reason: 'Acquired before Week 1 of rookie/2nd-year season.', trail, chain };
@@ -266,7 +270,11 @@ function evaluateTaxiEligibility(playerId, rosterId, playersMap, seasonChain, ma
   if (yearsExp === undefined || yearsExp === null || yearsExp > TAXI_YEARS_EXP_MAX) {
     return { eligible: false, reason: `Not a 1st or 2nd-year player (years_exp=${yearsExp}).`, trail: [] };
   }
-  return traceEligibility(playerId, rosterId, seasonChain, teamNameByRosterId);
+  // Unlike the QB/TE exception rule, taxi additions aren't restricted to before
+  // Week 1 - that would make the 3-moves-per-season allowance meaningless, since
+  // there'd be no in-season window to use those moves in. Any drafted or
+  // waiver/free-agent-added 1st/2nd-year player qualifies, at any time.
+  return traceEligibility(playerId, rosterId, seasonChain, teamNameByRosterId, false);
 }
 
 // Counts how many PRIOR seasons (not the current one) a player appears in any
