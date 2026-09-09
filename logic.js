@@ -20,10 +20,16 @@ function computeWeek1Date(season, overrides = {}) {
 }
 
 // Given a roster and the players map, returns arrays of player_ids at QB and TE.
+// Only counts players against the QB/TE limit if they're on the active/bench
+// roster - taxi squad and IR are separate roster real estate in dynasty formats
+// and have their own rules (taxi) or are exempted by convention (IR), so a
+// player sitting in either shouldn't also count against the 2+1 QB/TE limit.
 function classifyRosterPositions(roster, playersMap) {
   const out = { QB: [], TE: [] };
   const ids = roster.players || [];
+  const excludedIds = new Set([...(roster.taxi || []), ...(roster.reserve || [])]);
   for (const pid of ids) {
+    if (excludedIds.has(pid)) continue;
     const p = playersMap[pid];
     if (!p) continue;
     if (p.position === 'QB') out.QB.push(pid);
